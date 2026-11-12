@@ -45,6 +45,24 @@ def send(text):
     r.raise_for_status()
 
 
+def send_photo(path, caption):
+    with open(path, "rb") as f:
+        r = requests.post(
+            f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto",
+            data={"chat_id": TG_CHAT, "caption": caption, "parse_mode": "HTML"},
+            files={"photo": f},
+            timeout=30,
+        )
+    r.raise_for_status()
+
+
+def notify(image, text):
+    try:
+        send_photo(image, text)
+    except Exception:
+        send(text)  # если картинки нет или отправка не удалась, шлём просто текст
+
+
 def fmt(sec):
     h, m = divmod(int(sec // 60), 60)
     return f"{h} ч {m} мин" if h else f"{m} мин"
@@ -94,14 +112,16 @@ def main():
             t = datetime.now(TZ).strftime("%d.%m %H:%M")
             dur = fmt(now - state["since"])
             if cur == "offline":
-                send(
+                notify(
+                    "no_light.jpg",
                     "🔴🔴🔴 <b>СВЕТА НЕТ!</b> 🔴🔴🔴\n\n"
                     f"🕐 Пропал около <b>{t}</b>\n"
                     f"💡 Свет был: <b>{dur}</b>\n"
                     "📡 EcoFlow потерял связь"
                 )
             else:
-                send(
+                notify(
+                    "light_on.jpg",
                     "🟢🟢🟢 <b>СВЕТ ВЕРНУЛСЯ!</b> 🟢🟢🟢\n\n"
                     f"🕐 Появился около <b>{t}</b>\n"
                     f"⏳ Не было: <b>{dur}</b>"
