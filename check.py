@@ -4,11 +4,11 @@ from zoneinfo import ZoneInfo
 import requests
 
 HOST = "https://api-e.ecoflow.com"
-AK = os.environ["q8rVYYMc3T4RR4lHIhOK3Z3XNyfhEfeV"]
-SK = os.environ["yBcu5JjF6jwVP5wdsP8fYvnpMgTwWBvH"]
-SN = os.environ["R631ZEBAWH3W0378"]
-TG_TOKEN = os.environ["9022343226:AAFCM8xqrjYL5oxf2A7xf7BaAzyrke-6tus"]
-TG_CHAT = os.environ["107095115"]
+AK = os.environ["ECOFLOW_ACCESS_KEY"]
+SK = os.environ["ECOFLOW_SECRET_KEY"]
+SN = os.environ["ECOFLOW_SN"]
+TG_TOKEN = os.environ["TELEGRAM_TOKEN"]
+TG_CHAT = os.environ["TELEGRAM_CHAT_ID"]
 
 STATE_FILE = "state.json"
 NEEDED = {"offline": 2, "online": 1}   # сколько проверок подряд нужно для подтверждения
