@@ -39,7 +39,7 @@ def is_online():
 def send(text):
     r = requests.post(
         f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage",
-        data={"chat_id": TG_CHAT, "text": text},
+        data={"chat_id": TG_CHAT, "text": text, "parse_mode": "HTML"},
         timeout=20,
     )
     r.raise_for_status()
@@ -75,7 +75,8 @@ def main():
     state = load()
 
     if state is None:
-        send("Мониторинг запущен. EcoFlow сейчас: " + ("в сети." if online else "не в сети."))
+        send("✅ <b>Мониторинг запущен!</b>\n\n⚡ EcoFlow сейчас: "
+             + ("🟢 <b>в сети</b>" if online else "🔴 <b>не в сети</b>"))
         save({"status": cur, "since": now, "candidate": None, "count": 0})
         return
 
@@ -90,12 +91,21 @@ def main():
             state["candidate"], state["count"] = cur, 1
 
         if state["count"] >= NEEDED[cur]:
-            t = datetime.now(TZ).strftime("%H:%M")
+            t = datetime.now(TZ).strftime("%d.%m %H:%M")
             dur = fmt(now - state["since"])
             if cur == "offline":
-                send(f"🔴 Света нет (EcoFlow офлайн), около {t}. Свет был {dur}.")
+                send(
+                    "🔴🔴🔴 <b>СВЕТА НЕТ!</b> 🔴🔴🔴\n\n"
+                    f"🕐 Пропал около <b>{t}</b>\n"
+                    f"💡 Свет был: <b>{dur}</b>\n"
+                    "📡 EcoFlow потерял связь"
+                )
             else:
-                send(f"🟢 Свет появился (EcoFlow онлайн), около {t}. Не было {dur}.")
+                send(
+                    "🟢🟢🟢 <b>СВЕТ ВЕРНУЛСЯ!</b> 🟢🟢🟢\n\n"
+                    f"🕐 Появился около <b>{t}</b>\n"
+                    f"⏳ Не было: <b>{dur}</b>"
+                )
             state = {"status": cur, "since": now, "candidate": None, "count": 0}
 
     if json.dumps(state, sort_keys=True) != before:
